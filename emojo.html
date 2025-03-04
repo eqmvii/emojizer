@@ -1,0 +1,135 @@
+<html>
+
+<head>
+    <title>Hello World</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.0"></script>
+</head>
+
+<body>
+    <div id="app">
+        <img src="https://media4.giphy.com/media/4bpK2k0Yru5Us/200.gif?name=fred" />
+        <img src="https://media4.giphy.com/media/4bpK2k0Yru5Us/200.gif" />
+        <img src="https://media4.giphy.com/media/4bpK2k0Yru5Us/200.gif?walrus=true" />
+        <img src="https://media4.giphy.com/media/4bpK2k0Yru5Us/200.gif?id=98047509827540982759478" />
+        <p>{{ message }}</p>
+        <p><input v-model="message" /></p>
+        <p>
+            <button v-on:click="reverseMessage">Reverse Message</button>
+        </p>
+        <p>You have clicked {{ clicks }} times.</p>
+        <p>
+            <span v-bind:title="hovermessage">
+                Hover your mouse over me for a few seconds to see my dynamically bound
+                title!
+            </span>
+        </p>
+        <p>
+            <span v-if="seen">Now you see me</span>
+        </p>
+        <ul>
+            <li v-for="todo in todos">{{ todo.text }}</li>
+        </ul>
+        <textarea v-model="textareadata"></textarea>
+        <br />
+        <h1>Total: {{ total }} </h1>
+        <ul>
+            <!-- TODO ERIC: loop through this? -->
+            <li>Veldspar: {{ ore_rows("Veldspar").toLocaleString() }}</li>
+            <li>Plagioclase: {{ ore_rows("Plagioclase").toLocaleString() }} </li>
+            <li>Scordite: {{ ore_rows("Scordite").toLocaleString() }} </li>
+            <li>Pyroxeres: {{ ore_rows("Pyroxeres").toLocaleString() }} </li>
+        </ul>
+        <hr />
+        <p> {{ textareadata }} </p>
+        <p>
+        <div style="max-width: 500px;">
+            <pre style="max-width: 500px;">{{ emojod() }} </pre>
+        </div>
+        <input type="text" v-model="emojod()" />
+        </p>
+        <button v-on:click="crayon()">do this</button>
+    </div>
+
+</html>
+
+<script>
+    var app = new Vue({
+        el: "#app",
+        data: {
+            message: "Hello Vue World!",
+            clicks: 0,
+            hovermessage:
+                "You loaded this page on " + new Date().toLocaleString(),
+            seen: true,
+            todos: [
+                { text: "hmm", id: 1 },
+                { text: "walrus", id: 2 }
+            ],
+            textareadata: "alalalala"
+        },
+        computed: {
+            // OLD, just for playing / testing
+            plagioclase_rows: function (ore_type) {
+                // Example Row:
+                // Azure Plagioclase	27,931	9,775 m3	22 km
+                return rows_array =
+                    this.textareadata
+                        .split("\n")
+                        .filter(row => row.includes("Plagioclase"))
+                        .map(row => row.split("\t"))
+                        // ignore any row that is just the name of the orw
+                        .filter(row_array => row_array.length > 1);
+            },
+            total: function () {
+                let total = this.ore_rows("Veldspar") + this.ore_rows("Plagioclase") + this.ore_rows("Scordite") + this.ore_rows("Pyroxeres");
+                return total.toLocaleString();
+            }
+        },
+        methods: {
+            emojod: function () {
+                let jawn = this.textareadata.split('').map((letter) => {
+                    console.log(letter);
+                    if (letter === ' ') {
+                        return 'abcdefg';
+                    } else if (letter.match(/[a-zA-Z]/)) {
+                        return ':alphabet-white-' + letter + ':';
+                    }
+                    else {
+                        return letter;
+
+                    }
+                });
+                console.log(jawn);
+
+                let finaljawn = jawn.join('').replace(/abcdefg/g, '   ');
+                console.log(finaljawn);
+                return finaljawn;
+            },
+            crayon: function (event) {
+                console.log(event);
+            },
+            reverseMessage: function () {
+                this.message = this.message.split("").reverse().join("");
+            },
+            ore_rows: function (ore_type) {
+                // Example Row:
+                // Azure Plagioclase	27,931	9,775 m3	22 km
+                return rows_array =
+                    this.textareadata
+                        .split("\n")
+                        .filter(row => row.includes(ore_type))
+                        .map(row => row.split("\t"))
+                        // ignore any row that is just the name of the orw
+                        .filter(row_array => row_array.length > 1)
+                        // 9,775 m3
+                        .map(row_array => parseInt(
+                            row_array[2]
+                                .slice(0, -3)
+                                .replace(",", ""), 10
+                        ))
+                        // Add it up
+                        .reduce((total, num) => { return total + num }, 0);
+            },
+        }
+    });
+</script>
